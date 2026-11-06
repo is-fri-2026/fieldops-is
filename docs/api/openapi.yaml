@@ -1,142 +1,796 @@
 openapi: 3.1.0
 info:
-  title: Project API
-  version: 1.0.0
+  title: FieldOps REST API
+  version: 0.1.0
   description: |
-    Contract of the project's REST API. Keep it in sync with the implementation.
+    Načrtovana pogodba predloga; API še ni implementiran. Dve vlogi: admin in technician.
+    JWT 30 minut; pri vsaki zahtevi se preverita aktualna aktivnost in vloga v bazi.
+    Neznana polja DTO so zavrnjena. Napačen JSON je 400, neveljavna shema 422,
+    poslovni ali sočasni konflikt 409. Napake imajo application/problem+json po RFC 9457.
+    Na vsaki operaciji so možne tudi nepričakovane 500 napake brez internih podatkov.
+    Asset in Ticket imata celoten CRUD; Ticket DELETE je logični umik z ohranitvijo zgodovine.
+    Časi UTC, UUID identifikatorji. Seznami total računajo po omejitvi dostopa.
+  contact:
+    name: Ekipa FieldOps
+    url: https://github.com/is-fri-2026/fieldops-is
 servers:
-  - url: http://localhost:8080
-    description: Local
-  - url: https://example.invalid
-    description: Production (replace)
-
+  - url: http://localhost:3000
+    description: Načrtovani lokalni razvoj; produkcijski URL še ni ustvarjen.
+tags:
+  - { name: System, description: Preverjanje dosegljivosti }
+  - { name: Auth, description: Prijava in javni profil }
+  - { name: Assets, description: Evidenca opreme }
+  - { name: Tickets, description: 'Prijave, dodelitve, prehodi in zgodovina' }
+  - { name: Technicians, description: Aktivni kandidati in obremenitev }
+  - { name: AI, description: Predlog in potrjeni agent }
+security:
+  - bearerAuth: []
 paths:
   /health:
     get:
+      tags: [System]
       operationId: getHealth
-      summary: Health check
+      summary: Preveri runtime in povezavo z bazo
+      description: Javno; največ 60 zahtev/min/IP; brez podatkov o infrastrukturi ali poverilnicah.
       security: []
       responses:
-        "200":
-          description: Service is healthy
-
-  # Example resource — replace with your own.
-  /api/items:
-    get:
-      operationId: listItems
-      summary: List items
-      parameters:
-        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
-        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
-      responses:
-        "200":
-          description: A page of items
+        '200':
+          description: Aplikacija in baza dosegljivi.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ItemPage" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status]
+                properties:
+                  status: { type: string, const: ok }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/auth/login:
     post:
-      operationId: createItem
-      summary: Create an item
+      tags: [Auth]
+      operationId: login
+      summary: Prijavi aktivnega uporabnika
+      description: Generičen 401 ne razkrije obstoja računa. Omejitev 5 poskusov/min/IP; brez refresh toka.
+      security: []
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ItemCreate" }
+            schema: { $ref: '#/components/schemas/LoginInput' }
       responses:
-        "201":
-          description: Created
-          headers:
-            Location: { schema: { type: string } }
+        '200':
+          description: Podpisan JWT, 1800 sekund veljavnosti in javni profil.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Item" }
-        "400": { $ref: "#/components/responses/ValidationError" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-
-  /api/items/{id}:
-    parameters:
-      - { name: id, in: path, required: true, schema: { type: integer } }
+              schema: { $ref: '#/components/schemas/LoginResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/auth/me:
     get:
-      operationId: getItem
-      summary: Get an item
+      tags: [Auth]
+      operationId: getCurrentUser
+      summary: Vrni aktualni javni profil
+      description: Obe vlogi; izključno trenutni uporabnik, brez passwordHash.
       responses:
-        "200":
-          description: The item
+        '200':
+          description: Trenutni aktivni uporabnik.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Item" }
-        "404": { $ref: "#/components/responses/NotFound" }
-    delete:
-      operationId: deleteItem
-      summary: Delete an item
+              schema: { $ref: '#/components/schemas/UserSummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/assets:
+    get:
+      tags: [Assets]
+      operationId: listAssets
+      summary: Seznam opreme
+      description: Admin in technician; vrstni red inventoryCode ASC, id ASC.
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
       responses:
-        "204": { description: Deleted }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "404": { $ref: "#/components/responses/NotFound" }
-
+        '200':
+          description: Stran opreme.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssetPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    post:
+      tags: [Assets]
+      operationId: createAsset
+      summary: Ustvari opremo
+      description: Samo admin; inventoryCode se trim/uppercase normalizira in je enolična.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AssetCreate' }
+      responses:
+        '201':
+          description: Oprema ustvarjena.
+          headers:
+            Location: { schema: { type: string }, description: Pot do nove opreme. }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Asset' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/assets/{assetId}:
+    parameters:
+      - { $ref: '#/components/parameters/AssetId' }
+    get:
+      tags: [Assets]
+      operationId: getAsset
+      summary: Podrobnosti naprave, tudi po skeniranju QR
+      description: Obe vlogi; QR vsebuje samo UUID.
+      responses:
+        '200':
+          description: Oprema.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Asset' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    patch:
+      tags: [Assets]
+      operationId: updateAsset
+      summary: Delno uredi opremo
+      description: Samo admin; vsaj eno polje, zadnji potrjen zapis velja. ID in časi niso vhodna polja.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AssetUpdate' }
+      responses:
+        '200':
+          description: Posodobljena oprema.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Asset' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [Assets]
+      operationId: deleteAsset
+      summary: Izbriši napravo brez prijav
+      description: Samo admin. Vsaka povezana prijava, tudi umaknjena, prepreči izbris (409).
+      responses:
+        '204': { description: Oprema izbrisana; prazno telo. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/tickets:
+    get:
+      tags: [Tickets]
+      operationId: listTickets
+      summary: Filtriran seznam dovoljenih prijav
+      description: Admin vse neumaknjene; technician samo reporter ali dodeljeni. createdAt DESC, id ASC.
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TicketStatus' }
+        - name: assetId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Stran dovoljenih prijav; total po filtriranju pravic.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TicketPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    post:
+      tags: [Tickets]
+      operationId: createTicket
+      summary: Prijavi okvaro
+      description: Samo technician; reporterId iz JWT, OPEN/version 1; skupaj s CREATED dogodkom.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TicketCreate' }
+      responses:
+        '201':
+          description: Prijava in CREATED dogodek ustvarjena.
+          headers:
+            Location: { schema: { type: string }, description: Pot do nove prijave. }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Ticket' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/tickets/{ticketId}:
+    parameters:
+      - { $ref: '#/components/parameters/TicketId' }
+    get:
+      tags: [Tickets]
+      operationId: getTicket
+      summary: Podrobnosti dovoljene prijave
+      description: Admin ali reporter/dodeljeni tehnik. Tuja ali umaknjena prijava se skrije z 404.
+      responses:
+        '200':
+          description: Prijava s trenutno version in ID-ji dodeljenih tehnikov.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Ticket' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    patch:
+      tags: [Tickets]
+      operationId: updateTicket
+      summary: Uredi metapodatke OPEN prijave
+      description: Admin ali reporter. Nespremenljiva assetId/reporterId; status le prek status-changes. version se poveča in nastane UPDATED.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TicketUpdate' }
+      responses:
+        '200':
+          description: Posodobljena prijava.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Ticket' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [Tickets]
+      operationId: deleteTicket
+      summary: Logično umakni OPEN prijavo brez dodelitev
+      description: Samo admin; version kot query parameter. Nastavi deletedAt in DELETED dogodek; nadaljnji redni GET je 404. Admin dogodke še bere.
+      parameters:
+        - name: version
+          in: query
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '204': { description: Umaknjeno; prazno telo. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/tickets/{ticketId}/assignments:
+    parameters:
+      - { $ref: '#/components/parameters/TicketId' }
+    post:
+      tags: [Tickets]
+      operationId: assignTechnician
+      summary: Dodeli aktivnega tehnika
+      description: |
+        Samo admin; Ticket OPEN ali IN_PROGRESS, kandidat active technician, aktualna version.
+        En klic doda enega tehnika; več različnih klicev podpira M:N. Ročni podvojen par vrne 409.
+        Agentova pot doda confirmationToken; preverijo se podpis/actor/pair/TTL/version.
+        Assignment, povečanje version in ASSIGNED dogodek so ena transakcija.
+        Isti že porabljen veljaven token vrne prejšnji rezultat 200 brez drugega dogodka.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AssignmentCreate' }
+      responses:
+        '201':
+          description: Nova dodelitev.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Assignment' }
+        '200':
+          description: Idempotentna ponovitev iste veljavne agentove potrditve.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Assignment' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/tickets/{ticketId}/status-changes:
+    parameters:
+      - { $ref: '#/components/parameters/TicketId' }
+    post:
+      tags: [Tickets]
+      operationId: changeTicketStatus
+      summary: Prehod statusa dodeljenega tehnika
+      description: |
+        Samo aktivni dodeljeni technician; admin ni obvoz pravila.
+        OPEN v IN_PROGRESS ali IN_PROGRESS v RESOLVED; drugi prehodi/isti status in zastarela version so 409.
+        Status, resolvedAt, version in STATUS_CHANGED se zapišejo atomarno.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StatusChange' }
+      responses:
+        '200':
+          description: Prijava po prehodu.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Ticket' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/tickets/{ticketId}/events:
+    parameters:
+      - { $ref: '#/components/parameters/TicketId' }
+    get:
+      tags: [Tickets]
+      operationId: listTicketEvents
+      summary: Nespremenljiva časovnica prijave
+      description: Admin vse, tudi umaknjene; technician reporter/dodeljeni samo neumaknjene. createdAt ASC, id ASC. Brez tokenov/promptov.
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+      responses:
+        '200':
+          description: Stran dogodkov.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EventPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/technicians:
+    get:
+      tags: [Technicians]
+      operationId: listTechnicians
+      summary: Aktivni tehniki in njihova obremenitev
+      description: Samo admin. activeTicketCount šteje neumaknjene OPEN/IN_PROGRESS dodelitve. Vrstni red activeTicketCount ASC, id ASC; brez e-pošt/gesel.
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/PageSize' }
+      responses:
+        '200':
+          description: Stran aktivnih tehnikov.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TechnicianPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /api/ai/ticket-suggestions:
+    post:
+      tags: [AI]
+      operationId: suggestTicket
+      summary: Enkratni preverjen LLM predlog
+      description: Samo technician; brez orodij in zapisa Ticket. En klic, timeout 15 s, 5 zahtev/min/uporabnika. Napačen ponudnikov izhod ali izpad je 503; ročni vnos ostane.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [description]
+              properties:
+                description: { type: string, minLength: 10, maxLength: 2000 }
+      responses:
+        '200':
+          description: Predlog za ročni pregled.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TicketSuggestion' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/agent/assignment-recommendations:
+    post:
+      tags: [AI]
+      operationId: recommendAssignment
+      summary: Agentovo priporočilo brez domenskega pisanja
+      description: |
+        Samo admin; obvezni orodni branji Ticket in tehnikov prek API z uporabnikovim JWT.
+        Največ 6 orodnih in 4 modelskih klicev, 30 sekund, 5 zahtev/min/admin.
+        Preverjeni aktivni še nedodeljeni kandidat z najmanj obremenitvijo; tie-break id ASC.
+        Brez kandidata, že zaključen Ticket ali več kot 100 tehnikov je 409.
+        Strežnik izda 5-minutni podpisan token vezan na actor, ticket, technician, version in nonce.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [ticketId]
+              properties:
+                ticketId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Priporočilo za uporabnikovo izrecno potrditev.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssignmentRecommendation' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/agent/assignment-confirmations:
+    post:
+      tags: [AI]
+      operationId: confirmAssignment
+      summary: Izrecna uporabnikova potrditev agentovega predloga
+      description: |
+        Samo admin, samo po kliku Potrdi. Podpis, TTL in actor se preverijo na strežniku.
+        Handler brez dodatnega LLM klica omogoči assignTechnician REST orodje z istim JWT/tokenom.
+        Backend ponovno preveri kandidata, version in pravice. Neveljaven/potekel/tuji token 403;
+        napačen format 422; zastarela version 409. Isti veljaven porabljen token je idempotenten 200.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmationToken]
+              properties:
+                confirmationToken: { type: string, minLength: 32, maxLength: 4096 }
+      responses:
+        '201':
+          description: Potrjena dodelitev ustvarjena.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Assignment' }
+        '200':
+          description: Prvotni rezultat iste veljavne potrditve.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Assignment' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
+      description: 30 minut; sub uporabnikov UUID; preverba trenutne aktivnosti/vloge v bazi.
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PageSize:
+      name: pageSize
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    AssetId:
+      name: assetId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    TicketId:
+      name: ticketId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
   schemas:
-    Item:
+    LoginInput:
       type: object
-      required: [id, name]
+      additionalProperties: false
+      required: [email, password]
       properties:
-        id: { type: integer }
-        name: { type: string }
-    ItemCreate:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 1, maxLength: 128, writeOnly: true }
+    LoginResult:
       type: object
-      required: [name]
+      additionalProperties: false
+      required: [accessToken, tokenType, expiresIn, user]
       properties:
+        accessToken: { type: string }
+        tokenType: { type: string, const: Bearer }
+        expiresIn: { type: integer, const: 1800 }
+        user: { $ref: '#/components/schemas/UserSummary' }
+    UserSummary:
+      type: object
+      additionalProperties: false
+      required: [id, displayName, role]
+      properties:
+        id: { type: string, format: uuid }
+        displayName: { type: string, minLength: 1, maxLength: 100 }
+        role: { type: string, enum: [admin, technician] }
+    AssetCreate:
+      type: object
+      additionalProperties: false
+      required: [inventoryCode, name, location]
+      properties:
+        inventoryCode: { type: string, minLength: 1, maxLength: 40 }
         name: { type: string, minLength: 1, maxLength: 100 }
-    ItemPage:
+        location: { type: string, minLength: 1, maxLength: 100 }
+        description: { type: string, maxLength: 1000, default: '' }
+    AssetUpdate:
       type: object
-      required: [items, total, page, pageSize]
+      additionalProperties: false
+      minProperties: 1
       properties:
-        items: { type: array, items: { $ref: "#/components/schemas/Item" } }
-        total: { type: integer }
-        page: { type: integer }
-        pageSize: { type: integer }
+        inventoryCode: { type: string, minLength: 1, maxLength: 40 }
+        name: { type: string, minLength: 1, maxLength: 100 }
+        location: { type: string, minLength: 1, maxLength: 100 }
+        description: { type: string, maxLength: 1000 }
+    Asset:
+      type: object
+      additionalProperties: false
+      required: [id, inventoryCode, name, location, description, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        inventoryCode: { type: string, minLength: 1, maxLength: 40 }
+        name: { type: string, minLength: 1, maxLength: 100 }
+        location: { type: string, minLength: 1, maxLength: 100 }
+        description: { type: string, maxLength: 1000 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    TicketStatus: { type: string, enum: [OPEN, IN_PROGRESS, RESOLVED] }
+    Priority: { type: string, enum: [LOW, MEDIUM, HIGH] }
+    Category: { type: string, enum: [MECHANICAL, ELECTRICAL, SOFTWARE, OTHER] }
+    TicketCreate:
+      type: object
+      additionalProperties: false
+      required: [assetId, title, description]
+      properties:
+        assetId: { type: string, format: uuid }
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 2000 }
+        priority:
+          $ref: '#/components/schemas/Priority'
+          default: MEDIUM
+        category:
+          $ref: '#/components/schemas/Category'
+          default: OTHER
+    TicketUpdate:
+      type: object
+      additionalProperties: false
+      required: [version]
+      minProperties: 2
+      properties:
+        version: { type: integer, minimum: 1 }
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 2000 }
+        priority: { $ref: '#/components/schemas/Priority' }
+        category: { $ref: '#/components/schemas/Category' }
+    Ticket:
+      type: object
+      additionalProperties: false
+      required: [id, assetId, reporterId, title, description, priority, category, status, version, assignedTechnicianIds, createdAt, updatedAt, resolvedAt]
+      properties:
+        id: { type: string, format: uuid }
+        assetId: { type: string, format: uuid }
+        reporterId: { type: string, format: uuid }
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 2000 }
+        priority: { $ref: '#/components/schemas/Priority' }
+        category: { $ref: '#/components/schemas/Category' }
+        status: { $ref: '#/components/schemas/TicketStatus' }
+        version: { type: integer, minimum: 1 }
+        assignedTechnicianIds:
+          type: array
+          uniqueItems: true
+          items: { type: string, format: uuid }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        resolvedAt: { type: [string, 'null'], format: date-time }
+    StatusChange:
+      type: object
+      additionalProperties: false
+      required: [status, version]
+      properties:
+        status: { type: string, enum: [IN_PROGRESS, RESOLVED] }
+        version: { type: integer, minimum: 1 }
+    AssignmentCreate:
+      type: object
+      additionalProperties: false
+      required: [technicianId, version]
+      properties:
+        technicianId: { type: string, format: uuid }
+        version: { type: integer, minimum: 1 }
+        confirmationToken:
+          type: string
+          minLength: 32
+          maxLength: 4096
+          description: Zahtevan v agentovi potrditveni poti; pri ročni admin dodelitvi se izpusti.
+    Assignment:
+      type: object
+      additionalProperties: false
+      required: [id, ticketId, technicianId, assignedById, assignedAt]
+      properties:
+        id: { type: string, format: uuid }
+        ticketId: { type: string, format: uuid }
+        technicianId: { type: string, format: uuid }
+        assignedById: { type: string, format: uuid }
+        assignedAt: { type: string, format: date-time }
+    TicketEvent:
+      type: object
+      additionalProperties: false
+      required: [id, ticketId, actorId, eventType, changes, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        ticketId: { type: string, format: uuid }
+        actorId: { type: string, format: uuid }
+        eventType: { type: string, enum: [CREATED, UPDATED, ASSIGNED, STATUS_CHANGED, DELETED] }
+        changes:
+          type: object
+          description: Samo spremenjena dovoljena polja; brez confirmationNonce, ključev ali poverilnic.
+          additionalProperties: false
+          properties:
+            title: { $ref: '#/components/schemas/ChangeValue' }
+            description: { $ref: '#/components/schemas/ChangeValue' }
+            priority: { $ref: '#/components/schemas/ChangeValue' }
+            category: { $ref: '#/components/schemas/ChangeValue' }
+            status: { $ref: '#/components/schemas/ChangeValue' }
+            technicianId: { $ref: '#/components/schemas/ChangeValue' }
+            deletedAt: { $ref: '#/components/schemas/ChangeValue' }
+        createdAt: { type: string, format: date-time }
+    ChangeValue:
+      type: object
+      additionalProperties: false
+      required: [old, new]
+      properties:
+        old: { type: [string, 'null'], maxLength: 2000 }
+        new: { type: [string, 'null'], maxLength: 2000 }
+    Technician:
+      type: object
+      additionalProperties: false
+      required: [id, displayName, activeTicketCount]
+      properties:
+        id: { type: string, format: uuid }
+        displayName: { type: string, minLength: 1, maxLength: 100 }
+        activeTicketCount: { type: integer, minimum: 0 }
+    TicketSuggestion:
+      type: object
+      additionalProperties: false
+      required: [title, priority, category]
+      properties:
+        title: { type: string, minLength: 3, maxLength: 120 }
+        priority: { $ref: '#/components/schemas/Priority' }
+        category: { $ref: '#/components/schemas/Category' }
+    AssignmentRecommendation:
+      type: object
+      additionalProperties: false
+      required: [ticketId, technician, ticketVersion, reason, confirmationToken, expiresAt]
+      properties:
+        ticketId: { type: string, format: uuid }
+        technician: { $ref: '#/components/schemas/Technician' }
+        ticketVersion: { type: integer, minimum: 1 }
+        reason: { type: string, minLength: 1, maxLength: 500 }
+        confirmationToken: { type: string, minLength: 32, maxLength: 4096 }
+        expiresAt: { type: string, format: date-time }
+    PageMetadata:
+      type: object
+      required: [total, page, pageSize]
+      properties:
+        total: { type: integer, minimum: 0 }
+        page: { type: integer, minimum: 1 }
+        pageSize: { type: integer, minimum: 1, maximum: 100 }
+    AssetPage:
+      allOf:
+        - { $ref: '#/components/schemas/PageMetadata' }
+        - type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: '#/components/schemas/Asset' } }
+      unevaluatedProperties: false
+    TicketPage:
+      allOf:
+        - { $ref: '#/components/schemas/PageMetadata' }
+        - type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: '#/components/schemas/Ticket' } }
+      unevaluatedProperties: false
+    EventPage:
+      allOf:
+        - { $ref: '#/components/schemas/PageMetadata' }
+        - type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: '#/components/schemas/TicketEvent' } }
+      unevaluatedProperties: false
+    TechnicianPage:
+      allOf:
+        - { $ref: '#/components/schemas/PageMetadata' }
+        - type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: '#/components/schemas/Technician' } }
+      unevaluatedProperties: false
     ProblemDetails:
       type: object
-      description: RFC 9457 Problem Details
+      description: RFC 9457; status se ujema s HTTP. Brez SQL/stack trace ali poverilnic. errors samo za 422.
+      required: [type, title, status, detail]
       properties:
-        type: { type: string }
+        type: { type: string, format: uri-reference, default: 'about:blank' }
         title: { type: string }
-        status: { type: integer }
+        status: { type: integer, minimum: 400, maximum: 599 }
         detail: { type: string }
+        instance: { type: string, format: uri-reference }
         errors:
           type: object
           additionalProperties:
             type: array
             items: { type: string }
-
+      example:
+        type: about:blank
+        title: Neveljaven vhod
+        status: 422
+        detail: Preverite označena polja.
+        errors:
+          description: [Opis mora vsebovati vsaj 10 znakov.]
   responses:
-    ValidationError:
-      description: Invalid input
+    BadRequest:
+      description: Neveljaven JSON ali nepravilno kodirana zahteva (400).
       content:
         application/problem+json:
-          schema: { $ref: "#/components/schemas/ProblemDetails" }
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
     Unauthorized:
-      description: Not authenticated
+      description: Manjkajoča, potekla ali neveljavna prijava oziroma neaktiven račun (401).
       content:
         application/problem+json:
-          schema: { $ref: "#/components/schemas/ProblemDetails" }
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
     Forbidden:
-      description: Authenticated but not allowed
+      description: Prepovedana vloga/dejanje ali neveljaven podpis, actor oziroma potek potrditve (403).
       content:
         application/problem+json:
-          schema: { $ref: "#/components/schemas/ProblemDetails" }
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
     NotFound:
-      description: Resource not found
+      description: Vir ne obstaja ali je skrit zaradi dostopa/umika (404).
       content:
         application/problem+json:
-          schema: { $ref: "#/components/schemas/ProblemDetails" }
-
-security:
-  - bearerAuth: []
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    Conflict:
+      description: Enoličnost, povezani podatki, napačen prehod, nedovoljen kandidat ali zastarela version (409).
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    ValidationError:
+      description: Kršitev sheme, neznano polje ali neveljaven query/path parameter (422).
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    RateLimited:
+      description: Prekoračena omejitev poskusov ali porabe (429).
+      headers:
+        Retry-After: { description: Sekunde do novega poskusa., schema: { type: integer, minimum: 1 } }
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    Unavailable:
+      description: Baza ali ponudnik nedosegljiv; timeout ali neveljaven izhod ponudnika (503).
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }

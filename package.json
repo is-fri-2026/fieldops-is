@@ -1,0 +1,19 @@
+{
+  "name": "fieldops-proposal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministično preverjanje dokumentacije predloga; brez implementacije aplikacije.",
+  "engines": { "node": ">=22.12.0", "npm": ">=10.9.2" },
+  "scripts": {
+    "validate": "npm run lint:openapi && npm run check:docs",
+    "lint:openapi": "redocly lint docs/api/openapi.yaml",
+    "check:docs": "node scripts/validate-docs.mjs"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.76.0",
+    "jsdom": "27.0.1",
+    "mermaid": "12.3.0",
+    "yaml": "2.9.1"
+  }
+}

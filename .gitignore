@@ -13,4 +13,12 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
-# Add your stack's build output below (bin/, obj/, node_modules/, __pycache__/, build/, …)
+# Generated documentation tooling and planned application output
+node_modules/
+.next/
+dist/
+coverage/
+__pycache__/
+.expo/
+*.log
+artifacts/

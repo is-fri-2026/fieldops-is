@@ -5,47 +5,20 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-test:
+  proposal-validation:
+    name: OpenAPI, Mermaid and proposal consistency
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      # Week 1: add your own check here (see challenge C4).
-
-      # Week 2+: set up your runtime and build. Uncomment and adapt ONE of these:
-      #
-      # .NET
-      # - uses: actions/setup-dotnet@v4
-      #   with: { dotnet-version: "10.0.x" }
-      # - run: dotnet build --configuration Release
-      # - run: dotnet test --configuration Release --no-build
-      #
-      # Node / TypeScript
-      # - uses: actions/setup-node@v4
-      #   with: { node-version: "22", cache: npm }
-      # - run: npm ci
-      # - run: npm test
-      #
-      # Python
-      # - uses: actions/setup-python@v5
-      #   with: { python-version: "3.13", cache: pip }
-      # - run: pip install -r requirements.txt
-      # - run: pytest
-      #
-      # Java (Maven)
-      # - uses: actions/setup-java@v4
-      #   with: { distribution: temurin, java-version: "21", cache: maven }
-      # - run: mvn -B verify
-
-      - name: Placeholder
-        run: echo "CI is set up. Replace this step with your build and tests."
-
-  openapi-lint:
-    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: "22" }
-      - name: Lint OpenAPI spec
-        run: npx --yes @redocly/cli@latest lint docs/api/openapi.yaml
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-fund
+      - run: npm run validate
+      - run: git diff --check

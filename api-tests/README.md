@@ -1,12 +1,13 @@
-# API tests
+# Načrt testov API
 
-Put `.http` files (VS Code REST Client / JetBrains HTTP Client), a Postman or Bruno collection
-here. Cover every endpoint, including error cases (`400`, `401`, `403`, `404`, `409`).
+API še ni implementiran; ta mapa ohranja mesto iz uradne predloge. Trenutni izvedljivi pregled je `npm run validate`, ki preveri pogodbo in dokumentacijo, ne HTTP implementacije.
 
-```http
-@baseUrl = http://localhost:8080
-@token = <paste a token for local testing — never commit a real one>
+Do `midterm` bodo dodani avtomatizirani integracijski testi na ločeni PostgreSQL bazi:
 
-GET {{baseUrl}}/api/items
-Authorization: Bearer {{token}}
-```
+1. Prijava aktivnega računa → JWT; napačno geslo 401; technician na admin operaciji 403; brez JWT 401.
+2. Asset create/read/update/delete → 201/200/200/204; duplicate inventoryCode 409; izbris z vezanim Ticket 409; manjkajoč Asset 404.
+3. Ticket create → Assignment → IN_PROGRESS → RESOLVED → časovnica; preveriti dogodke, nedodeljenega tehnika 403, preskok/zastarelo version 409 ter nedovoljen vhod 422.
+4. Filtriranje/pagination ne razkrijeta tujih prijav ali total; rollback ob napaki dogodka; sočasna sprememba uspe največ enkrat.
+5. Logični umik OPEN brez dodelitev → GET 404, admin zgodovina ostane; ni fizičnega izbrisa dogodkov.
+
+Do `final`: mock LLM veljaven/neveljaven izhod, timeout; agent dejansko prebere prek orodij, pred potrditvijo nič ne zapiše, preveri TTL/identiteto/version in replay. Testi ne uporabljajo plačljivih modelskih klicev. Ročni `.http` primeri bodo uporabljali okoljske žetone, nikoli commitanih poverilnic.
