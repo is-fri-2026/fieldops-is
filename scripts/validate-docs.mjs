@@ -67,7 +67,7 @@ for (const story of stories) {
   assert(story.story.startsWith('Kot ') && / želim(?:\s|,)/u.test(story.story));
   assert(story.criteria.length >= 3 && story.criteria.every((c) => /Given.+When.+Then/.test(c)));
   assert(Number.isInteger(story.issueNumber) && story.issueNumber > 0);
-  assert.equal(story.issueUrl, `https://github.com/luka1222424/fieldops-is/issues/${story.issueNumber}`);
+  assert.equal(story.issueUrl, `https://github.com/is-fri-2026/fieldops-is/issues/${story.issueNumber}`);
   assert(proposal.includes(story.issueUrl), `Missing proposal link: ${story.id}`);
   if (story.priority === 'Must') {
     const section = proposal.match(new RegExp(`### ${story.id}[^]*?(?=\\n### |\\n## |$)`))?.[0];

@@ -1,7 +1,7 @@
 {
   "stories": [
     {
-      "id": "M1", "title": "Varna prijava in dostop glede na vlogo", "priority": "Must", "milestone": "midterm", "issueNumber": 1, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/1",
+      "id": "M1", "title": "Varna prijava in dostop glede na vlogo", "priority": "Must", "milestone": "midterm", "issueNumber": 1, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/1",
       "story": "Kot tehnik ali skrbnik se želim varno prijaviti in odpreti svoje delovno okolje, da dostopam samo do dovoljenih podatkov in dejanj.",
       "criteria": [
         "Given aktiven uporabnik in pravilno geslo, When se prijavi, Then API vrne kratkoživi JWT in uporabnikov javni DTO brez passwordHash; splet odpre ustrezno delovno okolje.",
@@ -11,7 +11,7 @@
       ]
     },
     {
-      "id": "M2", "title": "Upravljanje evidence opreme s celotnim CRUD", "priority": "Must", "milestone": "midterm", "issueNumber": 2, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/2",
+      "id": "M2", "title": "Upravljanje evidence opreme s celotnim CRUD", "priority": "Must", "milestone": "midterm", "issueNumber": 2, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/2",
       "story": "Kot skrbnik želim ustvariti, pregledati, urediti in izbrisati opremo, da tehniki prijavljajo okvare na pravilni napravi.",
       "criteria": [
         "Given skrbnik in veljavni podatki z novo inventoryCode, When ustvari opremo, Then prejme 201 z Location; oprema je vidna na seznamu in na podrobnostih tudi tehniku.",
@@ -21,7 +21,7 @@
       ]
     },
     {
-      "id": "M3", "title": "Prijava, popravek in umik okvare s CRUD prijav", "priority": "Must", "milestone": "midterm", "issueNumber": 3, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/3",
+      "id": "M3", "title": "Prijava, popravek in umik okvare s CRUD prijav", "priority": "Must", "milestone": "midterm", "issueNumber": 3, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/3",
       "story": "Kot tehnik želim prijaviti okvaro opreme in popraviti njeno odprto prijavo, da ekipa prejme uporaben opis težave.",
       "criteria": [
         "Given prijavljen tehnik in obstoječa oprema, When pošlje naslov in opis, Then nastane Ticket v OPEN, reporterId iz žetona, priority MEDIUM in category OTHER, če nista podana; odgovor je 201 z Location in nastane CREATED dogodek.",
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "id": "M4", "title": "Pregled in filtriranje dovoljenih prijav", "priority": "Must", "milestone": "midterm", "issueNumber": 4, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/4",
+      "id": "M4", "title": "Pregled in filtriranje dovoljenih prijav", "priority": "Must", "milestone": "midterm", "issueNumber": 4, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/4",
       "story": "Kot skrbnik želim pregledati vse prijave, kot tehnik pa svoje ustvarjene ali dodeljene prijave, da vem, katere okvare zahtevajo obravnavo.",
       "criteria": [
         "Given skrbnik oziroma tehnik, When odpre seznam, Then vidi vse neumaknjene prijave oziroma samo tiste, katerih avtor ali dodeljeni tehnik je.",
@@ -41,7 +41,7 @@
       ]
     },
     {
-      "id": "M5", "title": "Dodelitev enega ali več tehnikov prijavi", "priority": "Must", "milestone": "midterm", "issueNumber": 5, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/5",
+      "id": "M5", "title": "Dodelitev enega ali več tehnikov prijavi", "priority": "Must", "milestone": "midterm", "issueNumber": 5, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/5",
       "story": "Kot skrbnik želim prijavi dodeliti enega ali več aktivnih tehnikov, da je jasno, kdo je odgovoren za popravilo.",
       "criteria": [
         "Given prijava OPEN ali IN_PROGRESS in aktiven tehnik, When skrbnik potrdi dodelitev, Then nastane Assignment s technicianId, assignedById in assignedAt ter ASSIGNED dogodek v isti transakciji; odgovor je 201.",
@@ -51,7 +51,7 @@
       ]
     },
     {
-      "id": "M6", "title": "Nadzorovani prehodi statusa dodeljene prijave", "priority": "Must", "milestone": "midterm", "issueNumber": 6, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/6",
+      "id": "M6", "title": "Nadzorovani prehodi statusa dodeljene prijave", "priority": "Must", "milestone": "midterm", "issueNumber": 6, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/6",
       "story": "Kot dodeljeni tehnik želim označiti začetek in zaključek popravila, da ekipa pozna dejansko stanje okvare.",
       "criteria": [
         "Given aktivni dodeljeni tehnik in OPEN prijava, When pošlje IN_PROGRESS z veljavno version, Then prejme 200 in nastane STATUS_CHANGED dogodek.",
@@ -61,7 +61,7 @@
       ]
     },
     {
-      "id": "M7", "title": "Nespremenljiva zgodovina obravnave prijave", "priority": "Must", "milestone": "midterm", "issueNumber": 7, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/7",
+      "id": "M7", "title": "Nespremenljiva zgodovina obravnave prijave", "priority": "Must", "milestone": "midterm", "issueNumber": 7, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/7",
       "story": "Kot skrbnik ali upravičeni tehnik želim videti časovno zgodovino prijave, da razumem, kdo je kaj spremenil in kdaj.",
       "criteria": [
         "Given ustvarjanje, urejanje, dodelitev ali prehod statusa, When transakcija uspe, Then nastane natanko en ustrezen TicketEvent s časom, actorId in dovoljenimi starimi/novimi vrednostmi.",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "id": "S1", "title": "Android: QR opreme in delo s prijavami", "priority": "Should", "milestone": "final", "issueNumber": 8, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/8",
+      "id": "S1", "title": "Android: QR opreme in delo s prijavami", "priority": "Should", "milestone": "final", "issueNumber": 8, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/8",
       "story": "Kot tehnik želim ob napravi skenirati QR-kodo, pregledati opremo, prijaviti okvaro in urediti svojo odprto prijavo, da ne prepisujem oznake naprave.",
       "criteria": [
         "Given nameščena Android aplikacija in prijavljen tehnik, When skenira QR z UUID opreme, Then prek nameščenega API pridobi podrobnosti in omogoči ustvarjanje prijave.",
@@ -81,7 +81,7 @@
       ]
     },
     {
-      "id": "S2", "title": "Preverjen strukturiran LLM predlog opisa okvare", "priority": "Should", "milestone": "final", "issueNumber": 9, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/9",
+      "id": "S2", "title": "Preverjen strukturiran LLM predlog opisa okvare", "priority": "Should", "milestone": "final", "issueNumber": 9, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/9",
       "story": "Kot tehnik želim iz opisa okvare dobiti predlog naslova, prioritete in kategorije, da pripravim bolj jasno prijavo, ki jo pred oddajo sam preverim.",
       "criteria": [
         "Given opis dolžine 10–2000 znakov, When tehnik zahteva pomoč, Then en klic LLM vrne title, priority in category, preverjene z Zod in končnimi enum vrednostmi.",
@@ -91,7 +91,7 @@
       ]
     },
     {
-      "id": "S3", "title": "Agent za priporočilo in potrjeno dodelitev tehnika", "priority": "Should", "milestone": "final", "issueNumber": 10, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/10",
+      "id": "S3", "title": "Agent za priporočilo in potrjeno dodelitev tehnika", "priority": "Should", "milestone": "final", "issueNumber": 10, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/10",
       "story": "Kot skrbnik želim, da agent preveri prijavo in obremenitve tehnikov ter po moji izrecni potrditvi izvede dodelitev, da manj časa porabim za razporejanje.",
       "criteria": [
         "Given skrbnik in odprta prijava, When zažene agenta, Then agent z uporabnikovim JWT pokliče getTicket in listTechnicians, primerja aktivne dodelitve in vrne preverjeno priporočilo z razlogom.",
@@ -101,7 +101,7 @@
       ]
     },
     {
-      "id": "S4", "title": "Javno nameščen sistem z avtomatizirano dostavo", "priority": "Should", "milestone": "final", "issueNumber": 11, "issueUrl": "https://github.com/luka1222424/fieldops-is/issues/11",
+      "id": "S4", "title": "Javno nameščen sistem z avtomatizirano dostavo", "priority": "Should", "milestone": "final", "issueNumber": 11, "issueUrl": "https://github.com/is-fri-2026/fieldops-is/issues/11",
       "story": "Kot član ekipe želim iz main samodejno namestiti preverjeno različico na javni HTTPS naslov z upravljano bazo, da jo lahko uporabniki in ocenjevalec zanesljivo preizkusijo.",
       "criteria": [
         "Given uspešni testi PR in odobrena združitev v main, When CD steče, Then iz Dockerfile zgradi Next.js, izvede migracije in namesti splet ter API na Railway z upravljanim PostgreSQL.",

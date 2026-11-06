@@ -12,7 +12,7 @@ info:
     Časi UTC, UUID identifikatorji. Seznami total računajo po omejitvi dostopa.
   contact:
     name: Ekipa FieldOps
-    url: https://github.com/luka1222424/fieldops-is
+    url: https://github.com/is-fri-2026/fieldops-is
 servers:
   - url: http://localhost:3000
     description: Načrtovani lokalni razvoj; produkcijski URL še ni ustvarjen.

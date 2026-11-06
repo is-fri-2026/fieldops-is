@@ -32,17 +32,17 @@ Vsaka zgodba ima dejanski issue, prioriteto in mejnik. [Kanonični backlog](back
 
 | ID | Uporabniška zgodba | MoSCoW | Mejnik | Issue |
 |---|---|---|---|---|
-| M1 | Kot tehnik ali skrbnik se želim varno prijaviti in odpreti svoje delovno okolje, da dostopam samo do dovoljenih podatkov in dejanj. | Must | midterm | [#1](https://github.com/luka1222424/fieldops-is/issues/1) |
-| M2 | Kot skrbnik želim ustvariti, pregledati, urediti in izbrisati opremo, da tehniki prijavljajo okvare na pravilni napravi. | Must | midterm | [#2](https://github.com/luka1222424/fieldops-is/issues/2) |
-| M3 | Kot tehnik želim prijaviti okvaro opreme in popraviti njeno odprto prijavo, da ekipa prejme uporaben opis težave. | Must | midterm | [#3](https://github.com/luka1222424/fieldops-is/issues/3) |
-| M4 | Kot skrbnik želim pregledati vse prijave, kot tehnik pa svoje ustvarjene ali dodeljene prijave, da vem, katere okvare zahtevajo obravnavo. | Must | midterm | [#4](https://github.com/luka1222424/fieldops-is/issues/4) |
-| M5 | Kot skrbnik želim prijavi dodeliti enega ali več aktivnih tehnikov, da je jasno, kdo je odgovoren za popravilo. | Must | midterm | [#5](https://github.com/luka1222424/fieldops-is/issues/5) |
-| M6 | Kot dodeljeni tehnik želim označiti začetek in zaključek popravila, da ekipa pozna dejansko stanje okvare. | Must | midterm | [#6](https://github.com/luka1222424/fieldops-is/issues/6) |
-| M7 | Kot skrbnik ali upravičeni tehnik želim videti časovno zgodovino prijave, da razumem, kdo je kaj spremenil in kdaj. | Must | midterm | [#7](https://github.com/luka1222424/fieldops-is/issues/7) |
-| S1 | Kot tehnik želim ob napravi skenirati QR-kodo, pregledati opremo, prijaviti okvaro in urediti svojo odprto prijavo, da ne prepisujem oznake naprave. | Should | final | [#8](https://github.com/luka1222424/fieldops-is/issues/8) |
-| S2 | Kot tehnik želim iz opisa okvare dobiti predlog naslova, prioritete in kategorije, da pripravim bolj jasno prijavo, ki jo pred oddajo sam preverim. | Should | final | [#9](https://github.com/luka1222424/fieldops-is/issues/9) |
-| S3 | Kot skrbnik želim, da agent preveri prijavo in obremenitve tehnikov ter po moji izrecni potrditvi izvede dodelitev, da manj časa porabim za razporejanje. | Should | final | [#10](https://github.com/luka1222424/fieldops-is/issues/10) |
-| S4 | Kot član ekipe želim iz main samodejno namestiti preverjeno različico na javni HTTPS naslov z upravljano bazo, da jo lahko uporabniki in ocenjevalec zanesljivo preizkusijo. | Should | final | [#11](https://github.com/luka1222424/fieldops-is/issues/11) |
+| M1 | Kot tehnik ali skrbnik se želim varno prijaviti in odpreti svoje delovno okolje, da dostopam samo do dovoljenih podatkov in dejanj. | Must | midterm | [#1](https://github.com/is-fri-2026/fieldops-is/issues/1) |
+| M2 | Kot skrbnik želim ustvariti, pregledati, urediti in izbrisati opremo, da tehniki prijavljajo okvare na pravilni napravi. | Must | midterm | [#2](https://github.com/is-fri-2026/fieldops-is/issues/2) |
+| M3 | Kot tehnik želim prijaviti okvaro opreme in popraviti njeno odprto prijavo, da ekipa prejme uporaben opis težave. | Must | midterm | [#3](https://github.com/is-fri-2026/fieldops-is/issues/3) |
+| M4 | Kot skrbnik želim pregledati vse prijave, kot tehnik pa svoje ustvarjene ali dodeljene prijave, da vem, katere okvare zahtevajo obravnavo. | Must | midterm | [#4](https://github.com/is-fri-2026/fieldops-is/issues/4) |
+| M5 | Kot skrbnik želim prijavi dodeliti enega ali več aktivnih tehnikov, da je jasno, kdo je odgovoren za popravilo. | Must | midterm | [#5](https://github.com/is-fri-2026/fieldops-is/issues/5) |
+| M6 | Kot dodeljeni tehnik želim označiti začetek in zaključek popravila, da ekipa pozna dejansko stanje okvare. | Must | midterm | [#6](https://github.com/is-fri-2026/fieldops-is/issues/6) |
+| M7 | Kot skrbnik ali upravičeni tehnik želim videti časovno zgodovino prijave, da razumem, kdo je kaj spremenil in kdaj. | Must | midterm | [#7](https://github.com/is-fri-2026/fieldops-is/issues/7) |
+| S1 | Kot tehnik želim ob napravi skenirati QR-kodo, pregledati opremo, prijaviti okvaro in urediti svojo odprto prijavo, da ne prepisujem oznake naprave. | Should | final | [#8](https://github.com/is-fri-2026/fieldops-is/issues/8) |
+| S2 | Kot tehnik želim iz opisa okvare dobiti predlog naslova, prioritete in kategorije, da pripravim bolj jasno prijavo, ki jo pred oddajo sam preverim. | Should | final | [#9](https://github.com/is-fri-2026/fieldops-is/issues/9) |
+| S3 | Kot skrbnik želim, da agent preveri prijavo in obremenitve tehnikov ter po moji izrecni potrditvi izvede dodelitev, da manj časa porabim za razporejanje. | Should | final | [#10](https://github.com/is-fri-2026/fieldops-is/issues/10) |
+| S4 | Kot član ekipe želim iz main samodejno namestiti preverjeno različico na javni HTTPS naslov z upravljano bazo, da jo lahko uporabniki in ocenjevalec zanesljivo preizkusijo. | Should | final | [#11](https://github.com/is-fri-2026/fieldops-is/issues/11) |
 
 **Could:** dodatna polirava prikaza filtrov/časovnice, samo če ostane čas; ne nova entiteta ali funkcionalni podsistem. **Won't:** IoT, napovedovanje okvar, chat, plačila, GPS, push, fotografije, zahtevni urniki, rezervni deli, nabava, integracije, več organizacij, samoregistracija, ponastavitev gesla, prerazporejanje in ponovno odpiranje RESOLVED. Ne dodajamo šestega domenskega objekta.
 
@@ -99,6 +99,15 @@ Tehnik stoji ob centrifugi/laboratorijski napravi. Na telefonu se prijavi, skeni
 
 JWT je v SecureStore. Nalaganje, napačen QR, nedovoljena kamera, potek seje in offline imajo jasna stanja; ročni UUID je fallback. Offline ne ustvarjamo skrite čakalne vrste ali prikazujemo lažnega uspeha. QR vsebuje samo UUID, ne poljubnega URL-ja, gesla ali osebnih podatkov.
 
+### S1 – pogoji za sprejem na Androidu
+
+Pri mejniku `final` na telefonu z Androidom preverimo naslednje scenarije prek nameščenega API:
+
+- **Izbira naprave.** Ko tehnik skenira UUID znane naprave, telefon pokaže njeno inventarno oznako in ime, da ju lahko primerja z nalepko. Če zavrne dostop do kamere, lahko isto napravo izbere z ročnim vnosom UUID. QR s spletnim naslovom se zavrne brez odpiranja povezave; pri neznanem UUID (404) oddaja za to napravo ni na voljo.
+- **Oddaja in seznam.** Ko tehnik na izbrani napravi odda veljaven naslov in opis, se potrditev prikaže šele po odgovoru 201. Po ponovnem odprtju seznama vidi ustvarjeno prijavo v stanju OPEN in v podrobnostih isto napravo ter opis. Dodeljena prijava drugega avtorja je prav tako vidna, tuja nedodeljena prijava pa je izključena.
+- **Urejanje in sočasnost.** Ko avtor popravi opis lastne OPEN prijave, po odgovoru 200 in osvežitvi vidi novi opis. Če je med urejanjem drug odjemalec spremenil prijavo, telefon ob 409 ponudi ponovni prikaz aktualnih podatkov. Stare spremembe ne pošlje znova samodejno.
+- **Izguba povezave ali seje.** Če je telefon brez povezave pred oddajo, obrazec ohrani vnos in pokaže napako. Po vrnitvi povezave se zahteva pošlje šele ob ponovnem dotiku gumba za oddajo. Če API vrne 401 zaradi poteklega JWT, aplikacija odstrani žeton iz SecureStore in zahteva ponovno prijavo.
+
 ## Ločeni funkciji LLM in agenta
 
 **S2 – en klic modela:** opis → `{ title, priority, category }`, priority LOW/MEDIUM/HIGH, category MECHANICAL/ELECTRICAL/SOFTWARE/OTHER. Rezultat se preveri z Zod, uporabnik ga pregleda. Ni orodij ali samodejnega Ticket zapisa; napačen JSON/timeout vrne 503, ročni vnos deluje.
@@ -111,10 +120,10 @@ JWT je v SecureStore. Nalaganje, napačen QR, nedovoljena kamera, potek seje in 
 |---|---|
 | Predlog, 3.–4. teden | Ta dokument, model, arhitektura, ADR, pogodba, 11 issuejev, PR; resnični skupni pregled še potreben |
 | 5.–6. teden | Migracije/seed, avtentikacija, CRUD opreme/prijav, enotska pravila in začetni API testi |
-| [midterm, 7. teden](https://github.com/luka1222424/fieldops-is/milestone/1) | M1–M7: delujoči glavni spletni poteki obeh vlog, REST/OpenAPI, vloge/pravice, zgodovina, ≥3 integracije, CI build/test in Docker; demonstracija na seed podatkih |
+| [midterm, 7. teden](https://github.com/is-fri-2026/fieldops-is/milestone/1) | M1–M7: delujoči glavni spletni poteki obeh vlog, REST/OpenAPI, vloge/pravice, zgodovina, ≥3 integracije, CI build/test in Docker; demonstracija na seed podatkih |
 | 8.–9. teden | S4 namestitev in migracije, S1 Android z nameščenim API; dopolnitev ADR za auth/deploy/mobile |
 | 10.–11. teden | S2 preverjen predlog, S3 prava orodna zanka s potrditvijo, mock testi in ročna evalvacija |
-| [final, 12. teden](https://github.com/luka1222424/fieldops-is/milestone/2) | S1–S4, javni HTTPS splet/API in baza, CD iz main, health/logs, Android build, štirje vsebinski ADR, končni pregled in zagovor |
+| [final, 12. teden](https://github.com/is-fri-2026/fieldops-is/milestone/2) | S1–S4, javni HTTPS splet/API in baza, CD iz main, health/logs, Android build, štirje vsebinski ADR, končni pregled in zagovor |
 
 Koledarskih rokov midterm/final ne izmišljamo; nastavijo se po potrditvi urnika predmeta. Ocenjen skupni proračun je 12–16 ur/teden za ekipo, približno 108–144 ur; to je delovna ocena, ne potrjena razpoložljivost članov. Jedro približno 60 ur, Android 18, AI 18, oblak/dokazi 12, ostanek rezerva.
 
@@ -138,4 +147,4 @@ Predlagana delitev: @luka1222424 vodi model, API, transakcije, auth, teste in CI
 
 Uporabljeni so [uradna delavnica](https://is-professor.github.io/is-labs/sl/weeks/03-proposal/), [zahteve](https://is-professor.github.io/is-labs/sl/project/requirements/), [rubrika](https://is-professor.github.io/is-labs/sl/project/rubrics/proposal/), [API navodila](https://is-professor.github.io/is-labs/sl/weeks/04-api-design/) in [izvorna predloga](https://github.com/is-fri-2026/is-project-template). Matrika preverbe je v [poročilu](proposal-verification.md); uporaba Codexa v [dnevniku](ai-usage-log.md).
 
-GitHub PR ni dokaz opravljenega predmeta. Zahtevana sta dejanski pregled/prispevek obeh članov in asistentova odobritev; ne mergeamo ali tagamo samodejno. V Moodle oba oddasta `https://github.com/luka1222424/fieldops-is` v »Predlog projekta – Project proposal«; dejanska oddaja mora biti posebej preverjena.
+GitHub PR ni dokaz opravljenega predmeta. Zahtevana sta dejanski pregled/prispevek obeh članov in asistentova odobritev; ne mergeamo ali tagamo samodejno. V Moodle oba oddasta `https://github.com/is-fri-2026/fieldops-is` v »Predlog projekta – Project proposal«; dejanska oddaja mora biti posebej preverjena.

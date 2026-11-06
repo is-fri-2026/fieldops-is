@@ -2,7 +2,7 @@
 
 FieldOps je načrtovan majhen informacijski sistem za delavnice in laboratorije: tehnik prijavi okvaro naprave, skrbnik dodeli izvajalce, ekipa pa spremlja obravnavo in zgodovino sprememb.
 
-Projekt pri predmetu **Informacijski sistemi, UL FRI, 2026/27**. Repozitorij: <https://github.com/luka1222424/fieldops-is>.
+Projekt pri predmetu **Informacijski sistemi, UL FRI, 2026/27**. Repozitorij: <https://github.com/is-fri-2026/fieldops-is>.
 
 ## Avtorja in dejansko stanje
 
@@ -70,4 +70,4 @@ Cloud gostovanje in morebitna poraba LLM lahko povzročita stroške; ta PR ne us
 | [Dnevnik UI](docs/ai-usage-log.md) | Dejanska uporaba Codexa in omejitve pregleda |
 | [Preverjanje predloga](docs/proposal-verification.md) | Matrika rubrike in še potrebni človeški koraki |
 
-V Moodle oba člana oddasta **isti URL repozitorija**, ne ZIP: `https://github.com/luka1222424/fieldops-is`. Oddaja v GitHub ni dokaz oddaje v Moodle ali odobritve asistenta. PR ostane nezdružen do dejanskega pregleda.
+V Moodle oba člana oddasta **isti URL repozitorija**, ne ZIP: `https://github.com/is-fri-2026/fieldops-is`. Oddaja v GitHub ni dokaz oddaje v Moodle ali odobritve asistenta. PR ostane nezdružen do dejanskega pregleda.

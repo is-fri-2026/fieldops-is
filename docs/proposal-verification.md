@@ -35,5 +35,5 @@ Ne trdimo, da parser pomeni vizualni render diagrama, da lint pomeni delujoč st
 1. Oba člana razumeta in pregledata celoten predlog, potrdita razdelitev ter opravita resnične lastne prispevke. Prvotna predloga je imela samo začetni commit; prispevkov sočlana ne ustvarja avtomatizacija pod njegovim imenom.
 2. Zahtevati dejanski pregled od sočlana; če GitHub zavrne, urediti sodelovanje/dostop. Sočlanov račun je @amarkrasniqi54321-ctrl. Uporabniško ime učnega asistenta ni bilo podano, zato se ga ne ugiba.
 3. Preveriti dodatni AI-POLICY.md v gradivih, dostopnih ekipi; javni poskusi so vrnili 404. [Dnevnik UI](ai-usage-log.md) to izrecno pove.
-4. Oba člana oddasta `https://github.com/luka1222424/fieldops-is` v pravilno Moodle nalogo, če oddaje ni mogoče dejansko preveriti v avtenticirani seji. GitHub ni potrdilo Moodle oddaje.
+4. Oba člana oddasta `https://github.com/is-fri-2026/fieldops-is` v pravilno Moodle nalogo, če oddaje ni mogoče dejansko preveriti v avtenticirani seji. GitHub ni potrdilo Moodle oddaje.
 5. Po dejanski odobritvi asistenta ekipa združi in označi predlog skladno z navodili predmeta. Ta naloga PR ne združi.
